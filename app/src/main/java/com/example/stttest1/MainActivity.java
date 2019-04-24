@@ -7,10 +7,9 @@ import android.content.pm.PackageManager;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
+import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 
@@ -64,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onEndOfSpeech() {
-
+                mSpeechRecognizer.stopListening();
             }
 
             @Override
@@ -94,25 +93,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        findViewById(R.id.button).setOnTouchListener(new View.OnTouchListener() {
+        findViewById(R.id.button).setOnClickListener(new View.OnClickListener(){
             @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                switch (motionEvent.getAction()) {
-                    case MotionEvent.ACTION_UP:
-                        //when the user removed the finger
-                        mSpeechRecognizer.stopListening();
-                        editText.setHint("You will see input here");
-                        break;
-
-                    case MotionEvent.ACTION_DOWN:
-                        //finger is on the button
-                        checkPermissions();
-                        mSpeechRecognizer.startListening(mSpeechRecognizerIntent);
-                        editText.setText("");
-                        editText.setHint("Listening...");
-                        break;
-                }
-                return false;
+            public void onClick(View view){
+                checkPermissions();
+                mSpeechRecognizer.startListening(mSpeechRecognizerIntent);
+                editText.setText("");
+                editText.setHint("Listening...");
             }
         });
     }
@@ -129,7 +116,6 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    //requesting permissions if it is necessary
     private void checkPermissions(){
         if(!hasPermissions(this, PERMISSIONS)){
             ActivityCompat.requestPermissions(this, PERMISSIONS, REQUEST_CODE_PERMISSION);
