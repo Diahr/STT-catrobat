@@ -12,7 +12,6 @@ import android.speech.SpeechRecognizer;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -32,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
             Manifest.permission.RECORD_AUDIO
     };
 
-    public List<String> supportedLanguages;
+    Spinner dynamicSpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,11 +118,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        /*Spinner dynamicSpinner = findViewById(R.id.dynamic_spinner);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_item, supportedLanguages);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        dynamicSpinner.setAdapter(adapter);
+        dynamicSpinner = findViewById(R.id.dynamic_spinner);
 
         dynamicSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -137,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
             public void onNothingSelected(AdapterView<?> parent) {
                 // TODO Auto-generated method stub
             }
-        });*/
+        });
     }
 
     public static boolean hasPermissions(Context context, String... permissions) {
@@ -159,9 +154,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public class LanguageDetailsChecker extends BroadcastReceiver{
-        private List<String> supported_languages;
-
-        private String languagePreference;
+        String languagePreference;
 
         @Override
         public void onReceive(Context context, Intent intent)
@@ -174,14 +167,14 @@ public class MainActivity extends AppCompatActivity {
             }
             if (results.containsKey(RecognizerIntent.EXTRA_SUPPORTED_LANGUAGES))
             {
-                supported_languages
-                        = results.getStringArrayList(RecognizerIntent.EXTRA_SUPPORTED_LANGUAGES);
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                        com.example.stttest1.MainActivity.this,
+                        android.R.layout.simple_spinner_item,
+                        results.getStringArrayList(RecognizerIntent.EXTRA_SUPPORTED_LANGUAGES));
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                dynamicSpinner.setAdapter(adapter);
             }
-            //got all languages!!
-            supportedLanguages = supported_languages;
-            for(String s: supportedLanguages){
-                Log.e("new message", "" + s);
-            }
+
         }
     }
 
