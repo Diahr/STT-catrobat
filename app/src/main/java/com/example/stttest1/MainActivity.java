@@ -125,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view,
                                        int position, long id) {
                 mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE,
-                        parent.getItemIdAtPosition(position));
+                        parent.getItemAtPosition(position).toString());
             }
 
             @Override
