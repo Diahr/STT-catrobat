@@ -7,6 +7,13 @@
     android:padding="12dp"
     tools:context="com.example.stttest1.MainActivity">
 
+    <Spinner
+        android:id="@+id/dynamic_spinner"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#89D2E0"
+        android:layout_marginBottom="20dp"
+        android:layout_marginTop="20dp" />
 
     <EditText
         android:id="@+id/editText"

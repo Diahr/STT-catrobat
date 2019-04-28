@@ -1,6 +1,8 @@
 package com.example.stttest1;
 
 import android.Manifest;
+import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -11,9 +13,13 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
@@ -24,6 +30,8 @@ public class MainActivity extends AppCompatActivity {
             Manifest.permission.INTERNET,
             Manifest.permission.RECORD_AUDIO
     };
+
+    Spinner dynamicSpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +47,13 @@ public class MainActivity extends AppCompatActivity {
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE,
                 Locale.getDefault());
+
+        LanguageDetailsChecker LDC = new LanguageDetailsChecker();
+
+        Intent detailsIntent =  new Intent(RecognizerIntent.ACTION_GET_LANGUAGE_DETAILS);
+        sendOrderedBroadcast(
+                detailsIntent, null, LDC, null,
+                Activity.RESULT_OK, null, null);
 
         mSpeechRecognizer.setRecognitionListener(new RecognitionListener() {
             @Override
@@ -102,6 +117,22 @@ public class MainActivity extends AppCompatActivity {
                 editText.setHint("Listening...");
             }
         });
+
+        dynamicSpinner = findViewById(R.id.dynamic_spinner);
+
+        dynamicSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int position, long id) {
+                mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE,
+                        parent.getItemAtPosition(position).toString());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // TODO Auto-generated method stub
+            }
+        });
     }
 
     public static boolean hasPermissions(Context context, String... permissions) {
@@ -119,6 +150,31 @@ public class MainActivity extends AppCompatActivity {
     private void checkPermissions(){
         if(!hasPermissions(this, PERMISSIONS)){
             ActivityCompat.requestPermissions(this, PERMISSIONS, REQUEST_CODE_PERMISSION);
+        }
+    }
+
+    public class LanguageDetailsChecker extends BroadcastReceiver{
+        String languagePreference;
+
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            Bundle results = getResultExtras(true);
+            if (results.containsKey(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE))
+            {
+                languagePreference =
+                        results.getString(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE);
+            }
+            if (results.containsKey(RecognizerIntent.EXTRA_SUPPORTED_LANGUAGES))
+            {
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                        com.example.stttest1.MainActivity.this,
+                        android.R.layout.simple_spinner_item,
+                        results.getStringArrayList(RecognizerIntent.EXTRA_SUPPORTED_LANGUAGES));
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                dynamicSpinner.setAdapter(adapter);
+            }
+
         }
     }
 
